@@ -1,0 +1,21 @@
+# THIS FILE NEEDS TO BE ADDED TO EVERY REPO. IT WILL RUN AS PER THE CRON JOB AND EXECUTE THE CODE ANALYSIS FROM beazley/gh-advanced-security/.github/workflows/*.yml BASED ON THE LANGUAGE, 
+# SAVING THE NEED TO ADD THE CODE INDIVIDUAL LANGUAGE FILES TO EACH REPO
+name: "Run Code Analysis"
+
+on:
+  workflow_dispatch: #for testing
+  push:
+    branches: [ main ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ main ]
+  schedule:
+    - cron: '36 9 * * 0'
+
+jobs:
+  code-analysis:
+    uses: beazley/gh-advanced-security/.github/workflows/code-analysis.yml@main
+    # If your repo needs internal files/artifacts for C# builds then you must use self hosted runners - these are currently "tc_ukprap201", "tc_ukdvap222" & "ghas".
+    # Otherwise its best to use github runners. To use github runners comment out the following two lines. 
+    with:
+      runner: 'ghas'
