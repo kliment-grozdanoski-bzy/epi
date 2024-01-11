@@ -1,0 +1,34 @@
+{
+    "reportsFolder": "Reports",
+    "reports": 
+    [
+        {
+            "name": "Acturis - FTS Reconciliation (Dataset)",
+            "fileName": "Acturis - FTS Reconciliation (Dataset).pbix",
+            "reportSuffix": "#{pbi.report.suffix}",
+            "refreshSchedule": {
+                "value": {
+                    "enabled": true,
+                    "days": [
+                        "Sunday",
+                        "Monday",
+                        "Tuesday",
+                        "Wednesday",
+                        "Thursday",
+                        "Friday",
+                        "Saturday"
+                    ],
+                    "times": [
+                        "08:30"
+                    ],
+                    "localTimeZoneId": "UTC"
+                }
+            },
+            "parameters": 
+            {   
+                "Server_Acturis": "#{pbi.parameters.Server}",
+                "Database_Acturis": "#{pbi.parameters.Database}"
+            }
+        }
+    ]
+}
