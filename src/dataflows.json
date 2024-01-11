@@ -1,0 +1,33 @@
+{
+    "dataflowsFolder": "Dataflows",
+    "dataflows": 
+    [
+        {
+            "name": "Hello World",
+            "fileName": "hello-world.json",
+            "refreshSchedule": {
+                "value": {
+                    "enabled": true,
+                    "days": [
+                        "Sunday",
+                        "Monday",
+                        "Tuesday",
+                        "Wednesday",
+                        "Thursday",
+                        "Friday",
+                        "Saturday"
+                    ],
+                    "times": [
+                        "08:30"
+                    ],
+                    "localTimeZoneId": "UTC"
+                }
+            },
+            "parameters": 
+            {   
+                "Server": "#{pbi.parameters.Server}",
+                "Database": "#{pbi.parameters.Database}"
+            }
+        }
+    ]
+}
