@@ -1,0 +1,81 @@
+{
+  "name": "BeazleyTheme",
+  "textClasses": { "callout": { "fontSize": 20 } },
+  "dataColors": [
+    "#CF118C",
+    "#3C145F",
+    "#4B92DB",
+    "#882345",
+    "#00A9C9",
+    "#E59AC1",
+    "#766F8E",
+    "#90B1DE",
+    "#BE7F90",
+    "#A3D8EA",
+    "#F2CCE3",
+    "#B3B0C5",
+    "#C2D2EC",
+    "#DDBEC6",
+    "#D4EAF5",
+    "#BFBFBF",
+    "#FDAB89",
+    "#B687AC",
+    "#28738A",
+    "#A78F8F",
+    "#168980",
+    "#293537",
+    "#BB4A4A",
+    "#B59525",
+    "#475052",
+    "#6A9FB0",
+    "#BD7150",
+    "#7B4F71",
+    "#1B4D5C",
+    "#706060",
+    "#0F5C55",
+    "#1C2325"
+  ],
+  "visualStyles": {
+    "*": {
+      "*": {
+        "background": [{ "transparency": 100 }],
+        "border": [{ "show": false }],
+        "visualHeader": [
+          {
+            "background": { "solid": { "color": "#FFFFFF" } },
+            "transparency": 100,
+            "border": { "solid": { "color": "#FFFFFF" } }
+          }
+        ],
+        "visualTooltip": [
+          {
+            "titleFontColor": { "solid": { "color": "#FFFFFF" } },
+            "valueFontColor": { "solid": { "color": "#FFFFFF" } }
+          }
+        ],
+        "outspacePane": [
+          { "backgroundColor": { "solid": { "color": "#FFFFFF" } } }
+        ],
+        "filterCard": [
+          {
+            "$id": "Applied",
+            "backgroundColor": { "solid": { "color": "#F3F2F1" } },
+            "transparency": 100
+          },
+          {
+            "$id": "Available",
+            "backgroundColor": { "solid": { "color": "#FFFFFF" } },
+            "transparency": 100
+          }
+        ]
+      }
+    },
+    "page": {
+      "*": {
+        "background": [
+          { "color": { "solid": { "color": "#FFFFFF" } }, "transparency": 100 }
+        ]
+      }
+    }
+  }
+}
