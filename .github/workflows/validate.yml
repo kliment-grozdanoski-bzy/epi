@@ -1,0 +1,118 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Validate setup
+
+# Controls when the workflow will run
+on:
+  workflow_call:
+  
+env:
+  ApplicationName: ${{ github.event.repository.name }}
+  OCTO_SERVER: http://octopusdeploy.bfl.local
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  PR_URL: ${{ github.event.number }}
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  validate-setup:
+    if: ${{ startsWith(github.repository, 'poc-') }}
+    runs-on: powerapps
+    env:
+       # proxy setup
+      http_proxy: http://gateway.zscloud.net:80
+      https_proxy: http://gateway.zscloud.net:80
+      no_proxy: localhost,.local,.beazley.com,.internal
+      SSL_CERT_FILE: "c:\\opscode\\chef\\embedded\\ssl\\certs\\cacert.pem"
+      NODE_EXTRA_CA_CERTS: "c:\\opscode\\chef\\embedded\\ssl\\certs\\cacert.pem"
+      
+      
+    outputs:
+      isValidOctopus: ${{ steps.validate-octopus.outputs.isValidOctopus }}
+      isValidName: ${{ steps.validate-name.outputs.isValidName }} 
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install Octopus CLI 🐙
+        uses: OctopusDeploy/install-octopus-cli-action@v1
+        with:
+          version: latest
+      
+      - name: Check if project created in Octopus Deploy 🐙
+        id: validate-octopus
+        shell: powershell
+        run: |
+          $projectList = octo list-projects --server=${{ env.OCTO_SERVER }} --apiKey=${{ secrets.OCTO_API_KEY }} --outputformat=json | ConvertFrom-Json
+          $project = $projectList | Where { $_.Name -eq "TESTTESTTEST" }
+          if ($project) {
+            echo "::set-output name=isValidOctopus::1"
+            
+          } else {
+            echo "::set-output name=isValidOctopus::0"
+          }
+            
+      - name: Validate repository name
+        id: validate-name
+        shell: powershell
+        run: |
+          $repoSplit = $env:ApplicationName -Split '-'
+          if ($repoSplit.Count -lt 2) {
+            echo "::set-output name=isValidName::0"
+          } else {
+            echo "::set-output name=isValidName::1"
+          }
+          
+      - name: show variables
+        run: |
+          echo "Is valid name : ${{ steps.validate-name.outputs.isValidName }} "
+          echo "Is valid octopus project: ${{ steps.validate-octopus.outputs.isValidOctopus }} "
+          
+          
+  review-pr:
+    if: ${{ startsWith(github.repository, 'poc-') }}
+    runs-on: ubuntu-latest
+    needs: [ validate-setup ]
+      
+    steps:
+      - uses: actions/checkout@v3
+        
+      - name: checkout branch
+        run: gh pr checkout ${{ env.PR_URL }}
+        
+      - name: set pr author
+        id: set-pr-author
+        shell: pwsh
+        run: |
+          $pr = gh pr view ${{ env.PR_URL }} --json author | ConvertFrom-Json
+          echo "::set-output name=author::$($pr.author.login)"
+      
+      - name: Request repository name change
+        if: ${{ needs.validate-setup.outputs.isValidName == 0}}
+        run: |
+          echo "### :red_circle: Bad repository name" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Please rename your project to follow the format `team-projectGroup-PBI`" >> $GITHUB_STEP_SUMMARY
+          
+          TXT="### :red_circle: Bad repository name
+          Please rename your project to follow the format `team-projectGroup-PBI`"
+          
+          gh pr review ${{ env.PR_URL }} -r --body "$TXT"
+          
+        
+      - name: Request octopus deploy project
+        if: ${{ needs.validate-setup.outputs.isValidOctopus == 0}} 
+        run: |
+          
+          echo "### :red_circle: Missing octopus deploy project" >> $GITHUB_STEP_SUMMARY
+          echo "">> $GITHUB_STEP_SUMMARY
+          echo "Please follow [Create a new Octopus Deploy project for Power BI Workspace content](https://beazley.atlassian.net/wiki/spaces/PDG/pages/3125477459) tutorial" >> $GITHUB_STEP_SUMMARY
+          
+          TXT="### :red_circle: Missing octopus deploy project
+          Please follow [Create a new Octopus Deploy project for Power BI Workspace content](https://beazley.atlassian.net/wiki/spaces/PDG/pages/3125477459) tutorial"
+          
+          gh pr review ${{ env.PR_URL }} -r --body "$TXT"
+          
+      - name: Check if valid
+        if: ${{ needs.validate-setup.outputs.isValidName == 0}} || ${{ needs.validate-setup.outputs.isValidOctopus == 0}}
+        run: exit 1
+        
