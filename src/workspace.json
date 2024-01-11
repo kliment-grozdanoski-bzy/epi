@@ -1,0 +1,29 @@
+{
+    "permissions":
+    [
+        {
+            "user" :"App.Pub.PowerBI.#{pbi.team.name}.RW",
+            "accessRight": "Admin",
+            "principalType": "Group",
+            "owners": "#{pbi.team.owners}"
+        },
+        {
+            "user" :"App.Pub.PowerBI.#{pbi.team.name}.RO",
+            "accessRight": "Viewer",
+            "principalType": "Group",
+            "owners": "#{pbi.team.owners}"
+        },
+        {
+            "user": "App.Pub.PowerBI.#{pbi.team.name}.#{pbi.workspace.code}.RW",
+            "accessRight": "Admin",
+            "principalType": "Group",
+            "owners": "#{pbi.team.owners};#{pbi.workspace.owners}"
+        },
+        {
+            "user": "App.Pub.PowerBI.#{pbi.team.name}.#{pbi.workspace.code}.RO",
+            "accessRight": "Viewer",
+            "principalType": "Group",
+            "owners": "#{pbi.team.owners};#{pbi.workspace.owners}"
+        }
+    ]
+}

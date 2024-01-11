@@ -1,0 +1,136 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Initialize Project
+
+# Controls when the workflow will run
+on:
+  workflow_call:
+    outputs:
+      PR_URL:
+        description: 'Pull request URL'
+        value: ${{ jobs.build.outputs.PR_URL }}
+        
+env:
+  ApplicationName: ${{ github.event.repository.name }}
+  OCTO_SERVER: http://octopusdeploy.bfl.local
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    if: ${{ startsWith(github.repository, 'poc-') }}
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    outputs:
+      PR_URL: ${{ steps.new-pr.outputs.PR_URL }}
+    
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.9.7
+        with:
+          versionSpec: '5.x'
+       
+      - name: Determine Version
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v0.9.7
+        with:
+          useConfigFile: true
+          configFilePath: GitVersion.yml
+      
+      - name: get semver
+        id: getsemver
+        run: | 
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]
+          then
+            echo "::set-output name=SemVer::${{ steps.gitversion.outputs.SemVer }}"
+          else 
+            echo "::set-output name=SemVer::${{ steps.gitversion.outputs.MajorMinorPatch }}.${{ steps.gitversion.outputs.PreReleaseNumber }}"
+          fi
+          
+      - name: Set branch name
+        run: echo "branchName=init-proj-${{ steps.getsemver.outputs.SemVer }}" >> $GITHUB_ENV
+
+      - name: New branch init-proj
+        run: |
+          git config --global user.name 'github-actions' 
+          git config --global user.email 'github-actions@github.com'
+          
+          git checkout -b ${{ env.branchName }}
+          git push -u origin ${{ env.branchName }}
+          
+          
+      - name: Remove template files
+        run: |
+          if test -f ".github/workflows/main.yml"; then
+            echo "main.yml exists"
+            git rm .github/workflows/main.yml
+          fi
+          
+          if test -f ".github/workflows/init.yml"; then
+            echo "init.yml exists"
+            git rm .github/workflows/init.yml
+          fi
+          
+           if test -f ".github/workflows/validate.yml"; then
+            echo "validate.yml exists"
+            git rm .github/workflows/validate.yml
+          fi
+          
+      - name: Init nuspec file
+        run: |
+          if test -f "src/template-powerbi-reports.nuspec"; then
+            echo "template-powerbi-reports.nuspec found"
+            
+            git mv src/template-powerbi-reports.nuspec src/${{ env.ApplicationName }}.nuspec
+            
+            sed -i 's/template-powerbi-reports/${{ env.ApplicationName }}/' src/${{ env.ApplicationName }}.nuspec
+            
+          fi
+          
+      - name: Check for modified files
+        id: git-check
+        run: echo ::set-output name=modified::$(if [ -n "$(git status --porcelain)" ]; then echo "true"; else echo "false"; fi)
+
+      - name: Update changes in GitHub repository
+        if: steps.git-check.outputs.modified == 'true'
+        run:  |
+          
+          git add -A
+          git commit -m '[automated commit] init/upgrade PBI project'
+          git push
+          
+      - name: Adding markdown
+        run: |
+            SUMMARY=$(cat <<-END
+                ### Hello world! 
+                
+                New branch *${{ env.branchName }}* created. 
+                
+                [Create your first Pull Request](https://github.com/beazley/${{ env.ApplicationName }}/compare/main...${{ env.branchName }}) :rocket:
+                
+            END
+            )
+            
+            echo $SUMMARY >> $GITHUB_STEP_SUMMARY
+
+        
+      - name: New PR
+        id: new-pr
+        if: false
+        # if: steps.git-check.outputs.modified == 'true'
+        run: |
+          PR_URL=$(gh pr create --title "Init/upgrade project" --body "Upgrade to latest version") 
+          echo ::set-output name=PR_URL::$PR_URL 
+          
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+   
+  
+    
