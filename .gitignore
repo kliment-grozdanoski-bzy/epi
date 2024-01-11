@@ -1,0 +1,22 @@
+# Build and Release Folders
+bin-debug/
+bin-release/
+[Oo]bj/
+[Bb]in/
+
+# Other files and folders
+.settings/
+
+# Executables
+*.swf
+*.air
+*.ipa
+*.apk
+
+# Build tools
+[Bb]uild*/
+build.dev.cmd
+
+# template-powerbi-reports
+template-powerbi-reports/
+upgrade/template-powerbi-reports/

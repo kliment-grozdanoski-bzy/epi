@@ -1,0 +1,34 @@
+{
+    "reportsFolder": "Reports",
+    "reports": 
+    [
+        {
+            "name": "BZD Contingency UK Prebind Subjectivity Chaser",
+            "fileName": "BZD Contingency UK Prebind Subjectivity Chaser.pbix",
+            "reportSuffix": "#{pbi.report.suffix}",
+            "refreshSchedule": {
+                "value": {
+                    "enabled": true,
+                    "days": [
+                        "Sunday",
+                        "Monday",
+                        "Tuesday",
+                        "Wednesday",
+                        "Thursday",
+                        "Friday",
+                        "Saturday"
+                    ],
+                    "times": [
+                        "10:30"
+                    ],
+                    "localTimeZoneId": "UTC"
+                }
+            },
+            "parameters": 
+            {   
+            "Server_BrokerAccess": "#{pbi.parameters.Server_BrokerAccess}",
+            "Database_BrokerAccess": "#{pbi.parameters.Database_BrokerAccess}"
+            }
+        }
+    ]
+}

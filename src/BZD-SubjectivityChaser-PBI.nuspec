@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>BZD-SubjectivityChaser-PBI</id>
+    <version>1.0.0</version>
+    <authors>DevOps</authors>
+    <owners>DevOps</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>BZD-SubjectivityChaser-PBI</description>
+    <releaseNotes></releaseNotes>
+    <copyright>Copyright 2021</copyright>
+    <tags>PBI Continuous Deployment</tags>
+  </metadata>
+  <files>
+    <file src="Reports\**\*.pbix" target="Reports" />
+    <file src="Dataflows\**\*.json" target="Dataflows" exclude="*\**\*.template.json" />
+    <file src="Datasets\**\*.json" target="Datasets" />
+    <file src="Paginated\**\*.rdl" target="Paginated" />
+    <file src="*.json" target="Config" />
+  </files>
+ </package>
